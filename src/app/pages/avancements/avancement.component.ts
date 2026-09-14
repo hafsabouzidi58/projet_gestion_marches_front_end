@@ -120,13 +120,26 @@ export class AvancementComponent implements OnInit {
     }
   }
 
-  ouvrirFichier(nomFichier: string): void {
+telechargerFichier(nomFichier: string): void {
     this.avancementService.telechargerFichier(nomFichier).subscribe({
       next: (blob: Blob) => {
-        const windowUrl = URL.createObjectURL(blob);
-        window.open(windowUrl, '_blank');
+        // Crée une URL temporaire pour le Blob reçu
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Crée un lien <a> dynamique
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = nomFichier; // Forcer le téléchargement sous ce nom
+
+        // Ajoute au DOM, clique et supprime
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Libère la mémoire
+        URL.revokeObjectURL(blobUrl);
       },
-      error: (err) => console.error('Erreur lors de la lecture du fichier', err)
+      error: (err) => console.error('Erreur lors du téléchargement du fichier', err)
     });
   }
 }

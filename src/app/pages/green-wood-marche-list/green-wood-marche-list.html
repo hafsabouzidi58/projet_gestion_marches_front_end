@@ -20,12 +20,6 @@
       </div>
 
       <div class="col-md-5 text-end">
-        <button
-          class="btn me-2"
-          [ngClass]="isAlerteMode ? 'btn-danger' : 'btn-outline-danger'"
-          (click)="loadAlertes()">
-          ⚠️ Alertes Échéance (30j)
-        </button>
         <button *ngIf="isAlerteMode || searchTerm" class="btn btn-outline-secondary" (click)="resetFilters()">
           🔄 Réinitialiser
         </button>

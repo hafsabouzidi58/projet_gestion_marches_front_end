@@ -164,7 +164,9 @@
             <td>
               <ul class="list-unstyled mb-0">
                 <li *ngFor="let file of item.piecesJointes">
-                  <a href="javascript:void(0)" (click)="ouvrirFichier(file.nomFichier)" class="text-primary font-weight-bold">
+                  <a href="javascript:void(0)"
+                     (click)="telechargerFichier(file.nomFichier)"
+                     class="text-primary font-weight-bold cursor-pointer">
                     📁 {{ file.nomFichier }}
                   </a>
                 </li>
