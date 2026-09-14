@@ -74,9 +74,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: AdminDashboard },
       { path: 'users', component: UserManagement },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }  ,
-                    { path: 'audit-logs', component: AuditLogComponent },
-                          { path: 'mon-compte', component: EditProfileComponent }
-
+      { path: 'audit-logs', component: AuditLogComponent }
 ]
   },
 
@@ -106,6 +104,7 @@ export const routes: Routes = [
       { path: 'garanties', component: GarantieListComponent },
       { path: 'problemes', component: ListeProblemesComponent },
  { path: 'penalites', component: PenaliteBlockComponent },
+       { path: 'mon-compte', component: EditProfileComponent },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },

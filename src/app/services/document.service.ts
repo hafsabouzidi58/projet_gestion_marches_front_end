@@ -32,9 +32,8 @@ export class DocumentService {
   upload(marcheId: number, file: File): Observable<DocumentModel> {
     const formData = new FormData();
     formData.append('marcheId', marcheId.toString());
-    formData.append('typeDocument', 'DOCUMENT'); // On envoie une valeur par défaut au backend
     formData.append('file', file);
-
+    formData.append('typeDocument', typeDocument); // <-- AJOUTER CETTE LIGNE
     return this.http.post<DocumentModel>(`${this.apiUrl}/upload`, formData);
   }
 
