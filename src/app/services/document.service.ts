@@ -18,7 +18,7 @@ export interface DocumentModel {
 })
 export class DocumentService {
 
-  private apiUrl = 'http://localhost:8081/api/documents';
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/documents';
 
   constructor(private http: HttpClient) {}
 

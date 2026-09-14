@@ -15,8 +15,8 @@ export interface Marche {
 })
 export class ProblemeService {
 
-  private apiUrl = 'http://localhost:8081/api/problemes';
-  private marcheUrl = 'http://localhost:8081/api/marches'; // Adapter selon votre endpoint des marchés
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/problemes';
+  private marcheUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/marches'; // Adapter selon votre endpoint des marchés
 
   constructor(private http: HttpClient) { }
 

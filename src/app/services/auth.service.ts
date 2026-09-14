@@ -16,7 +16,7 @@ export interface RegisterRequest {
 })
 export class AuthService {
 
-  private AUTH_API = 'http://localhost:8081/api/auth/';
+  private AUTH_API = '${environment.apiUrl}/api/auth/';
 
   constructor(private http: HttpClient) {}
 

@@ -32,7 +32,7 @@ budget?: number | string;
   providedIn: 'root'
 })
 export class MarcheService {
-  private apiUrl = 'http://localhost:8081/api/marches';
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/marches';
 
   constructor(private http: HttpClient) {}
 

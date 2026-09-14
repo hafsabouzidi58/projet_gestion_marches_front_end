@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class TestService {
 
-  private apiUrl = 'http://localhost:8081/api';
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api';
 
   constructor(private http: HttpClient) {}
 

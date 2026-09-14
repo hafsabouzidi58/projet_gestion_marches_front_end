@@ -8,7 +8,7 @@ import { AuditLog } from '../models/audit-log.model';
 })
 export class AuditLogService {
 
-  private apiUrl = 'http://localhost:8081/api/audit-logs'; // Ajustez le port si nécessaire
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/audit-logs'; // Ajustez le port si nécessaire
 
   constructor(private http: HttpClient) { }
 

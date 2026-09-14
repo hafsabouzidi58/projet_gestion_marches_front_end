@@ -7,7 +7,7 @@ import { Garantie } from '../models/garantie.model';
   providedIn: 'root'
 })
 export class GarantieService {
-  private apiUrl = 'http://localhost:8081/api/garanties';
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/garanties';
 
   constructor(private http: HttpClient) {}
 

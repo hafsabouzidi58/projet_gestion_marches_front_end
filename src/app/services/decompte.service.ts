@@ -7,7 +7,7 @@ import { Decompte } from '../models/decompte.model';
   providedIn: 'root'
 })
 export class DecompteService {
-  private apiUrl = 'http://localhost:8081/api/decomptes';
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/decomptes';
 
   constructor(private http: HttpClient) {}
 

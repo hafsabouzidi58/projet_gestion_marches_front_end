@@ -32,7 +32,7 @@ export interface Nantissement {
   providedIn: 'root'
 })
 export class NantissementService {
-  private baseUrl = 'http://localhost:8081/api';
+  private baseUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api';
 
   constructor(private http: HttpClient) {}
 

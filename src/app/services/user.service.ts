@@ -16,8 +16,8 @@ export interface UserDTO {
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = 'http://localhost:8081/api/admin/users';
-  private profileUrl = 'http://localhost:8081/api/profile';
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/admin/users';
+  private profileUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/profile';
 
   constructor(private http: HttpClient) {}
 

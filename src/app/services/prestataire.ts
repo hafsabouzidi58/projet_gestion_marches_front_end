@@ -21,7 +21,7 @@ export interface Prestataire {
   providedIn: 'root'
 })
 export class PrestataireService {
-  private apiUrl = 'http://localhost:8081/api/prestataires';
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/prestataires';
 
   constructor(private http: HttpClient) {}
 

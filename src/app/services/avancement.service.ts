@@ -43,7 +43,7 @@ export interface AvancementResponse {
 })
 export class AvancementService {
 
-  private apiUrl = 'http://localhost:8081/api/avancements';
+  private apiUrl = 'https://projetgestionmarchesbackend-production.up.railway.app/api/avancements';
 
   constructor(private http: HttpClient) {}
 
@@ -79,7 +79,7 @@ export class AvancementService {
 
   // Ajouter cette méthode dans AvancementService
   getMarches(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:8081/api/marches');
+    return this.http.get<any[]>('https://projetgestionmarchesbackend-production.up.railway.app/api/marches');
   }
 
   // Ajouter l'option responseType: 'blob'
