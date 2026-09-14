@@ -1,0 +1,80 @@
+<div class="audit-container">
+  <div class="header-section">
+    <h2>Journal d'Audit System (Audit Logs)</h2>
+    <p>Historique et traçabilité des actions effectuées sur la plateforme Green Woods</p>
+  </div>
+
+  <!-- Barre de filtres et recherche -->
+  <div class="filter-card">
+    <div class="filter-group">
+      <input
+        type="text"
+        placeholder="Rechercher par utilisateur, IP, description..."
+        [(ngModel)]="termeRecherche"
+        (input)="appliquerFiltres()"
+        class="form-control"
+      />
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="filtreAction" (change)="appliquerFiltres()" class="form-control">
+        <option value="TOUT">Toutes les actions</option>
+        <option value="CREATE_MARCHE">Création Marché</option>
+        <option value="MODIFICATION_AVANCEMENT">Mise à jour Avancement</option>
+        <option value="AJOUTER_AVANCEMENT">Création Avancement</option>
+        <option value="CALCULER_SOLDE">calcule du solde </option>
+        <option value="AJOUTER_DECOMPTE">Création décompte</option>
+        <option value="DECLARER_PROB">Declaration Probléme</option>
+        <option value="CHANGER_ETAT">Changement d'état</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <select [(ngModel)]="filtreRole" (change)="appliquerFiltres()" class="form-control">
+        <option value="TOUT">Tous les rôles</option>
+        <option value="ADMIN_SYSTEME">Admin Système</option>
+        <option value="RESPONSABLE_MARCHES">Responsable Marchés</option>
+        <option value="RESPONSABLE_GREEN_WOOD">Responsable Green Wood</option>
+      </select>
+    </div>
+
+    <button class="btn-refresh" (click)="chargerLogs()">Rafraîchir</button>
+  </div>
+
+  <!-- Tableau des Logs -->
+  <div class="table-card">
+    <div *ngIf="chargement" class="spinner-box">
+      Chargement des logs d'audit...
+    </div>
+
+    <table *ngIf="!chargement" class="audit-table">
+      <thead>
+      <tr>
+        <th>Date & Heure</th>
+        <th>Utilisateur</th>
+        <th>Rôle</th>
+        <th>Action</th>
+        <th>Description</th>
+        <th>Adresse IP</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let log of logsFiltres">
+        <td class="timestamp">{{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+        <td><strong>{{ log.username }}</strong></td>
+        <td><span class="role-tag">{{ log.userRole }}</span></td>
+        <td>
+            <span class="badge" [ngClass]="getBadgeClass(log.action)">
+              {{ log.action }}
+            </span>
+        </td>
+        <td class="description">{{ log.description || '-' }}</td>
+        <td class="ip-address"><code>{{ log.ipAddress }}</code></td>
+      </tr>
+      <tr *ngIf="logsFiltres.length === 0">
+        <td colspan="6" class="no-data">Aucun journal d'audit trouvé.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

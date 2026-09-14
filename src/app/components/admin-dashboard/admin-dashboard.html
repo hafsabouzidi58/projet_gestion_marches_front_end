@@ -1,0 +1,146 @@
+<div class="dashboard-container">
+
+  <!-- En-tête -->
+  <div class="dashboard-header">
+    <div>
+      <h2>Journal d'Audit & Activités</h2>
+    </div>
+    <button (click)="chargerDonneesReelles()" class="btn-refresh">
+      🔄 Rafraîchir
+    </button>
+  </div>
+
+  <!-- Message d'erreur HTTP -->
+  <div *ngIf="errorMessage" class="error-banner">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <!-- Cartes de Statistiques Réelles -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon bg-primary-light">📋</div>
+      <div class="stat-data">
+        <span class="stat-value">{{ totalAudits }}</span>
+        <span class="stat-label">Logs d'audit affichés</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-success-light">👥</div>
+      <div class="stat-data">
+        <span class="stat-value">{{ activeRegisteredUsers }} / {{ totalRegisteredUsers }}</span>
+        <span class="stat-label">Comptes Utilisateurs Actifs</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-warning-light">👤</div>
+      <div class="stat-data">
+        <span class="stat-value">{{ uniqueUsersCount }}</span>
+        <span class="stat-label">Auteurs d'actions (sélection)</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon bg-info-light">📅</div>
+      <div class="stat-data">
+        <span class="stat-value">{{ todayAuditsCount }}</span>
+        <span class="stat-label">Audits Aujourd'hui</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barre de Filtres : Recherche + Picker Agenda -->
+  <div class="filters-wrapper">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Rechercher par utilisateur, action, rôle, IP..."
+        class="search-input"
+      />
+    </div>
+
+    <!-- Sélecteur de dates Agenda -->
+    <div class="date-picker-group">
+      <div class="date-input-container">
+        <label for="startDate">Du :</label>
+        <input
+          type="date"
+          id="startDate"
+          [(ngModel)]="startDate"
+          class="date-input"
+        />
+      </div>
+
+      <div class="date-input-container">
+        <label for="endDate">Au :</label>
+        <input
+          type="date"
+          id="endDate"
+          [(ngModel)]="endDate"
+          class="date-input"
+        />
+      </div>
+
+      <button
+        *ngIf="startDate || endDate"
+        (click)="reinitialiserDates()"
+        class="btn-reset-date"
+        title="Réinitialiser les dates"
+      >
+        ❌ Effacer dates
+      </button>
+    </div>
+  </div>
+
+  <!-- Indicateur de Chargement -->
+  <div *ngIf="isLoading" class="loading-state">
+    Chargement des données en cours...
+  </div>
+
+  <!-- Tableau des Audit Logs -->
+  <div *ngIf="!isLoading" class="table-card">
+    <table class="custom-table">
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Utilisateur</th>
+        <th>Rôle</th>
+        <th>Action</th>
+        <th>Description</th>
+        <th>Date & Heure</th>
+        <th>Adresse IP</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let log of filteredLogs">
+        <td class="id-cell">#{{ log.id }}</td>
+        <td>
+          <div class="user-cell">
+            <span class="avatar">{{ (log.username || 'S').charAt(0).toUpperCase() }}</span>
+            <span class="username">{{ log.username || 'Système' }}</span>
+          </div>
+        </td>
+        <td>
+          <span class="badge-role">{{ log.userRole || 'N/A' }}</span>
+        </td>
+        <td>
+          <span class="badge-action">{{ log.action }}</span>
+        </td>
+        <td class="desc-cell">{{ log.description }}</td>
+        <td class="date-cell">{{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+        <td class="ip-cell"><code>{{ log.ipAddress || '-' }}</code></td>
+      </tr>
+
+      <tr *ngIf="filteredLogs.length === 0">
+        <td colspan="7" class="empty-state">
+          Aucun journal d'audit ne correspond à vos critères de recherche.
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
