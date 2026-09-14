@@ -16,7 +16,7 @@ export interface RegisterRequest {
 })
 export class AuthService {
 
-  private AUTH_API = '${environment.apiUrl}/api/auth/';
+  private AUTH_API = 'https://projetgestionmarchesbackend-production.up.railway.app/api/auth/';
 
   constructor(private http: HttpClient) {}
 
