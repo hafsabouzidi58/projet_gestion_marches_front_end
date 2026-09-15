@@ -23,12 +23,6 @@
       </div>
 
       <div class="col-md-6 text-end">
-        <button
-          class="btn"
-          [ngClass]="isAlerteMode ? 'btn-danger' : 'btn-outline-danger'"
-          (click)="loadAlertes()">
-          ⚠️ Alertes Échéance (30j)
-        </button>
         <button *ngIf="isAlerteMode" class="btn btn-link text-secondary" (click)="loadMarches()">
           Réinitialiser la liste
         </button>
@@ -336,68 +330,4 @@
 <!-- ========================================== -->
 <!-- 4. MODAL DÉDIÉ AUX DOCUMENTS (GED)        -->
 <!-- ========================================== -->
-<div class="custom-modal-overlay" *ngIf="selectedMarcheForDocs" (click)="closeDocsModal()">
-  <div class="custom-modal-dialog modal-lg" (click)="$event.stopPropagation()">
-    <div class="custom-modal-header">
-      <div class="d-flex align-items-center gap-2">
-        <span class="modal-icon">📂</span>
-        <h5 class="m-0 fw-bold">Documents du Marché N° {{ selectedMarcheForDocs.numMarche }}</h5>
-      </div>
-      <button type="button" class="btn-close-custom" (click)="closeDocsModal()">✕</button>
-    </div>
-
-    <div class="custom-modal-body">
-      <div class="card p-3 mb-3 bg-light">
-        <div class="row g-2 align-items-center">
-          <div class="col-md-9">
-            <label class="form-label small fw-bold">Sélectionner un fichier</label>
-            <input
-              id="docFileInput"
-              type="file"
-              class="form-control form-control-sm"
-              (change)="onFileSelected($event)"
-            />
-          </div>
-          <div class="col-md-3 d-flex align-items-end">
-            <button
-              type="button"
-              class="btn btn-primary btn-sm w-100"
-              [disabled]="!selectedFile"
-              (click)="onUploadDoc()">
-              📤 Téléverser
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="table-responsive">
-        <table class="table table-striped align-middle" *ngIf="documents.length > 0; else noDocs">
-          <thead class="table-light">
-          <tr>
-            <th>Nom du fichier</th>
-            <th class="text-center" style="width: 200px;">Actions</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr *ngFor="let doc of documents">
-            <td class="text-break">📄 {{ doc.nomFichier }}</td>
-            <td class="text-center">
-              <button class="btn btn-sm btn-success me-1" (click)="onDownloadDoc(doc)" title="Télécharger">
-                📥 Télécharger
-              </button>
-              <button class="btn btn-sm btn-danger" (click)="onDeleteDoc(doc.id)" title="Supprimer">
-                🗑️
-              </button>
-            </td>
-          </tr>
-          </tbody>
-        </table>
-        <ng-template #noDocs>
-          <div class="text-center py-4 text-muted">
-            <p class="mb-0">Aucun document associé à ce marché.</p>
-          </div>
-        </ng-template>
-      </div>
-    </div>
-  </div>
 </div>

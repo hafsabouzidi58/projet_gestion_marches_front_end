@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { GarantieService } from '../../services/garantie.service';
+import { MarcheService, Marche } from '../../services/marche.service';
 import { Garantie } from '../../models/garantie.model';
 
 @Component({
@@ -13,6 +14,7 @@ import { Garantie } from '../../models/garantie.model';
 })
 export class GarantieListComponent implements OnInit {
   garanties: Garantie[] = [];
+  marches: Marche[] = []; // List des marchés pour le dropdown
   selectedGarantie: Partial<Garantie> = {};
   isEditMode: boolean = false;
   showModal: boolean = false;
@@ -24,16 +26,27 @@ export class GarantieListComponent implements OnInit {
     'CAUTION_AVANCE'
   ];
 
-  constructor(private garantieService: GarantieService) {}
+  constructor(
+    private garantieService: GarantieService,
+    private marcheService: MarcheService
+  ) {}
 
   ngOnInit(): void {
     this.loadGaranties();
+    this.loadMarches();
   }
 
   loadGaranties(): void {
     this.garantieService.getAllGaranties().subscribe({
       next: (data) => (this.garanties = data),
-      error: (err: any) => console.error('Erreur chargement:', err)
+      error: (err: any) => console.error('Erreur chargement garanties:', err)
+    });
+  }
+
+  loadMarches(): void {
+    this.marcheService.getAll().subscribe({
+      next: (data) => (this.marches = data),
+      error: (err: any) => console.error('Erreur chargement marchés:', err)
     });
   }
 
@@ -56,14 +69,14 @@ export class GarantieListComponent implements OnInit {
   openCreateModal(): void {
     this.isEditMode = false;
     this.selectedGarantie = {
-      typeGarantie: this.typesGarantie[0] // Valeur par défaut
+      typeGarantie: this.typesGarantie[0],
+      marcheId: this.marches.length > 0 ? this.marches[0].id : undefined
     };
     this.showModal = true;
   }
 
   openEditModal(garantie: Garantie): void {
     this.isEditMode = true;
-    // Formatage explicite de la date pour l'input type="date"
     let formattedDate = garantie.dateConstitution;
     if (formattedDate && formattedDate.includes('T')) {
       formattedDate = formattedDate.split('T')[0];
@@ -80,34 +93,36 @@ export class GarantieListComponent implements OnInit {
     this.showModal = false;
     this.selectedGarantie = {};
   }
-saveGarantie(): void {
-  const payload = {
-    id: this.selectedGarantie.id,
-    marcheId: Number(this.selectedGarantie.marcheId),
-    typeGarantie: this.selectedGarantie.typeGarantie,
-    montant: Number(this.selectedGarantie.montant),
-    dateConstitution: this.selectedGarantie.dateConstitution,
-    statutLiberation: this.selectedGarantie.statutLiberation || 'EN_COURS'
-  };
 
-  if (this.isEditMode && this.selectedGarantie.id) {
-    this.garantieService.updateGarantie(this.selectedGarantie.id, payload as any).subscribe({
-      next: () => {
-        this.loadGaranties();
-        this.closeModal();
-      },
-      error: (err: any) => console.error('Erreur lors de la modification:', err)
-    });
-  } else {
-    this.garantieService.createGarantie(payload as any).subscribe({
-      next: () => {
-        this.loadGaranties();
-        this.closeModal();
-      },
-      error: (err: any) => console.error('Erreur lors de la création:', err)
-    });
+  saveGarantie(): void {
+    const payload = {
+      id: this.selectedGarantie.id,
+      marcheId: Number(this.selectedGarantie.marcheId),
+      typeGarantie: this.selectedGarantie.typeGarantie,
+      montant: Number(this.selectedGarantie.montant),
+      dateConstitution: this.selectedGarantie.dateConstitution,
+      statutLiberation: this.selectedGarantie.statutLiberation || 'EN_COURS'
+    };
+
+    if (this.isEditMode && this.selectedGarantie.id) {
+      this.garantieService.updateGarantie(this.selectedGarantie.id, payload as any).subscribe({
+        next: () => {
+          this.loadGaranties();
+          this.closeModal();
+        },
+        error: (err: any) => console.error('Erreur lors de la modification:', err)
+      });
+    } else {
+      this.garantieService.createGarantie(payload as any).subscribe({
+        next: () => {
+          this.loadGaranties();
+          this.closeModal();
+        },
+        error: (err: any) => console.error('Erreur lors de la création:', err)
+      });
+    }
   }
-}
+
   libererGarantie(id: number): void {
     if (confirm('Voulez-vous vraiment libérer cette garantie ?')) {
       this.garantieService.libererGarantie(id).subscribe({
