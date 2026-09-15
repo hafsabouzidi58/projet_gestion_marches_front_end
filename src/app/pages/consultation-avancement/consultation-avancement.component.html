@@ -1,0 +1,158 @@
+<div class="container my-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>📈 Consultation du Suivi d'Avancement des Marchés</h2>
+  </div>
+
+  <!-- Step 1: Sélection du Marché -->
+  <div class="card mb-4 border-primary shadow-sm">
+    <div class="card-header bg-primary text-white font-weight-bold fw-bold">
+      🔍 Sélectionner un Marché à Consulter
+    </div>
+    <div class="card-body">
+      <div class="form-group mb-0">
+        <label class="mb-2 fw-semibold">Marché :</label>
+        <select class="form-select" [(ngModel)]="selectedMarcheId" (change)="onMarcheChange()">
+          <option [ngValue]="null">-- Choisir un marché --</option>
+          <option *ngFor="let m of marches" [ngValue]="m.id">
+            Marché N° {{ m.numMarche }} - {{ m.objetMarche }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Affichage de la vue consultation -->
+  <div *ngIf="selectedMarcheId">
+
+    <!-- Indicateurs de Performance & Pénalités Prédictives -->
+    <div *ngIf="prediction" class="card mb-4 shadow-sm" [ngClass]="{'border-danger': prediction.alertePrioritaire, 'border-success': !prediction.alertePrioritaire}">
+      <div class="card-header font-weight-bold fw-bold" [ngClass]="{'bg-danger text-white': prediction.alertePrioritaire, 'bg-light': !prediction.alertePrioritaire}">
+        📊 Indicateurs & Prédictions de Pénalités (Marché N° {{ prediction.numMarche }})
+      </div>
+      <div class="card-body">
+        <div class="row text-center align-items-center">
+          <div class="col-md-3">
+            <h6 class="text-muted">Prévu</h6>
+            <span class="badge bg-info text-white p-2" style="font-size: 1.2rem;">
+              {{ prediction.avancementPrevuPct }}%
+            </span>
+          </div>
+
+          <div class="col-md-3">
+            <h6 class="text-muted">Réel</h6>
+            <span class="badge bg-primary text-white p-2" style="font-size: 1.2rem;">
+              {{ prediction.avancementReelPct ?? 0 }}%
+            </span>
+          </div>
+
+          <div class="col-md-3">
+            <h6 class="text-muted">Écart</h6>
+            <span class="badge p-2 text-white"
+                  [ngClass]="prediction.ecartPct > 0 ? 'bg-danger' : 'bg-success'"
+                  style="font-size: 1.2rem;">
+              {{ prediction.ecartPct }}%
+            </span>
+          </div>
+
+          <div class="col-md-3">
+            <h6 class="text-muted">Pénalités Estimées</h6>
+            <span class="fw-bold text-danger d-block mt-1" style="font-size: 1.2rem;">
+              {{ prediction.montantPenaliteEstime | number:'1.2-2' }} DH
+            </span>
+          </div>
+        </div>
+
+        <!-- Jauges de Progression -->
+        <div class="row mt-4">
+          <div class="col-md-6 mb-2">
+            <div class="d-flex justify-content-between mb-1">
+              <small class="fw-bold text-muted">Progression Prévue</small>
+              <small class="fw-bold">{{ prediction.avancementPrevuPct }}%</small>
+            </div>
+            <div class="progress" style="height: 14px;">
+              <div class="progress-bar bg-info" [style.width.%]="prediction.avancementPrevuPct"></div>
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <div class="d-flex justify-content-between mb-1">
+              <small class="fw-bold text-muted">Progression Réelle</small>
+              <small class="fw-bold">{{ prediction.avancementReelPct ?? 0 }}%</small>
+            </div>
+            <div class="progress" style="height: 14px;">
+              <div class="progress-bar"
+                   [style.width.%]="prediction.avancementReelPct ?? 0"
+                   [ngClass]="(prediction.ecartPct ?? 0) > 0 ? 'bg-danger' : 'bg-success'">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historique des Avancements et Téléchargement des Pièces Jointes -->
+    <div class="card shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center bg-light">
+        <span class="fw-bold">📑 Historique des Avancements Saisis</span>
+        <div class="d-flex" style="width: 320px;">
+          <input type="text"
+                 class="form-control form-control-sm me-2"
+                 placeholder="Rechercher par description..."
+                 [(ngModel)]="searchKeyword"
+                 (keyup.enter)="onSearch()" />
+          <button class="btn btn-sm btn-outline-secondary" (click)="onSearch()">Filtrer</button>
+        </div>
+      </div>
+
+      <div class="card-body p-0">
+        <div *ngIf="isLoading" class="text-center py-4">
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
+
+        <div class="table-responsive" *ngIf="!isLoading">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+            <tr>
+              <th>Date</th>
+              <th>Prévu (%)</th>
+              <th>Réel (%)</th>
+              <th>Description / Remarques</th>
+              <th>Documents / Pièces Jointes</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let item of historique">
+              <td>{{ item.dateAvancement | date:'dd/MM/yyyy' }}</td>
+              <td>{{ item.tauxPrevu }}%</td>
+              <td><strong class="text-primary">{{ item.tauxReel }}%</strong></td>
+              <td>{{ item.description }}</td>
+              <td>
+                <div *ngIf="item.piecesJointes && item.piecesJointes.length > 0; else noDocs">
+                  <ul class="list-unstyled mb-0">
+                    <li *ngFor="let file of item.piecesJointes" class="mb-1">
+                      <button class="btn btn-sm btn-outline-primary py-0 px-2"
+                              (click)="telechargerFichier(file.nomFichier)"
+                              title="Télécharger le document">
+                        📥 {{ file.nomFichier }}
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+                <ng-template #noDocs>
+                  <span class="text-muted small">Aucun document</span>
+                </ng-template>
+              </td>
+            </tr>
+            <tr *ngIf="historique.length === 0">
+              <td colspan="5" class="text-center py-4 text-muted">
+                Aucun avancement ni document enregistré pour ce marché.
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

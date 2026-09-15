@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { MarcheService, Marche } from '../../services/marche.service';
+import { DecompteService } from '../../services/decompte.service';
+import { Decompte } from '../../models/decompte.model';
 
 export interface CountdownInfo {
   days: number;
@@ -27,11 +29,19 @@ export class GreenWoodMarcheListComponent implements OnInit, OnDestroy {
 
   selectedMarcheDetails: Marche | null = null;
 
+  // --- NOUVELLES VARIABLES POUR CONSULTATION DÉCOMPTES ---
+  selectedMarcheForDecompteList: Marche | null = null;
+  decomptes: Decompte[] = [];
+  isLoadingDecomptes: boolean = false;
+
   // Stockage du compte à rebours par ID de marché
   countdowns: { [marcheId: number]: CountdownInfo } = {};
   private timerId: any;
 
-  constructor(private marcheService: MarcheService) {}
+  constructor(
+    private marcheService: MarcheService,
+    private decompteService: DecompteService // <-- SERVICE INJECTÉ
+  ) {}
 
   ngOnInit(): void {
     this.loadMarches();
@@ -62,6 +72,7 @@ export class GreenWoodMarcheListComponent implements OnInit, OnDestroy {
       }
     });
   }
+
   onSearch(): void {
     if (!this.searchTerm.trim()) {
       this.loadMarches();
@@ -98,6 +109,29 @@ export class GreenWoodMarcheListComponent implements OnInit, OnDestroy {
 
   closeDetailsModal(): void {
     this.selectedMarcheDetails = null;
+  }
+
+  // --- NOUVELLES MÉTHODES DE CONSULTATION DES DÉCOMPTES ---
+  openDecomptesListModal(marche: Marche): void {
+    this.selectedMarcheForDecompteList = marche;
+    if (marche.id) {
+      this.isLoadingDecomptes = true;
+      this.decompteService.getByMarche(marche.id).subscribe({
+        next: (data) => {
+          this.decomptes = data;
+          this.isLoadingDecomptes = false;
+        },
+        error: (err) => {
+          console.error('Erreur chargement décomptes', err);
+          this.isLoadingDecomptes = false;
+        }
+      });
+    }
+  }
+
+  closeDecomptesListModal(): void {
+    this.selectedMarcheForDecompteList = null;
+    this.decomptes = [];
   }
 
   // --- LOGIQUE CALCUL CHRONO TEMPS RÉEL ---

@@ -18,12 +18,7 @@
           <button class="btn btn-success" (click)="onSearch()">🔍 Rechercher</button>
         </div>
       </div>
-
-      <div class="col-md-5 text-end">
-        <button *ngIf="isAlerteMode || searchTerm" class="btn btn-outline-secondary" (click)="resetFilters()">
-          🔄 Réinitialiser
-        </button>
-      </div>
+      
     </div>
   </div>
 
@@ -74,7 +69,10 @@
             👁️ Consulter
           </button>
 
-
+          <!-- BOUTON AJOUTÉ : CONSULTATION DES DÉCOMPTES -->
+          <button class="btn btn-sm btn-outline-success" (click)="openDecomptesListModal(m)" title="Consulter les décomptes">
+            📜 Décomptes
+          </button>
         </td>
       </tr>
       <tr *ngIf="marches.length === 0">
@@ -140,8 +138,51 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
 
+<!-- ========================================== -->
+<!-- MODAL CONSULTATION DES DÉCOMPTES (AJOUTÉE) -->
+<!-- ========================================== -->
+<div class="custom-modal-overlay" *ngIf="selectedMarcheForDecompteList" (click)="closeDecomptesListModal()">
+  <div class="custom-modal-dialog" (click)="$event.stopPropagation()">
+    <div class="custom-modal-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="modal-icon">📜</span>
+        <h5 class="m-0 fw-bold">Décomptes du Marché N° {{ selectedMarcheForDecompteList.numMarche }}</h5>
+      </div>
+      <button type="button" class="btn-close-custom" (click)="closeDecomptesListModal()">✕</button>
+    </div>
 
+    <div class="custom-modal-body">
+      <div *ngIf="isLoadingDecomptes" class="text-center py-4 text-muted">
+        Chargement des décomptes...
+      </div>
+
+      <div *ngIf="!isLoadingDecomptes" class="table-responsive">
+        <table class="table table-bordered align-middle mb-0">
+          <thead class="table-light">
+          <tr>
+            <th>N° Décompte</th>
+            <th>Date</th>
+            <th>Montant Brut</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let d of decomptes">
+            <td><strong class="text-primary">Décompte N° {{ d.numDecompte }}</strong></td>
+            <td>{{ d.dateDecompte | date:'dd/MM/yyyy' }}</td>
+            <td class="fw-bold text-success">{{ d.montantBrut | number:'1.2-2' }} DH</td>
+          </tr>
+          <tr *ngIf="decomptes.length === 0">
+            <td colspan="3" class="text-center text-muted py-3">
+              Aucun décompte enregistré pour ce marché.
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>

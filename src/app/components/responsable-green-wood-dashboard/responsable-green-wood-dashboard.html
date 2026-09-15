@@ -1,8 +1,56 @@
 <div class="dashboard-container p-4">
 
-  <h2 class="mb-4">Tableau de Bord - Responsable Green Wood</h2>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="m-0 fw-bold">Tableau de Bord - Responsable Green Wood</h2>
+      <p class="text-muted small m-0">Suivi des risques financiers, pénalités et avancement des marchés.</p>
+    </div>
+  </div>
 
-  <!-- Bloc d'Alertes Pénalités & Retards -->
+  <!-- SECTION 1: CARTES DE KPI (RÉSUMÉ RAPIDE) -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm border-start border-4 border-primary">
+        <div class="card-body">
+          <span class="text-muted small text-uppercase fw-bold">Total Marchés</span>
+          <h3 class="fw-bold my-1">{{ totalMarchesCount }}</h3>
+          <span class="text-primary small">💼 Marchés sous responsabilité</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm border-start border-4 border-danger">
+        <div class="card-body">
+          <span class="text-muted small text-uppercase fw-bold">Alertes Critiques</span>
+          <h3 class="fw-bold text-danger my-1">{{ alertesCritiquesCount }}</h3>
+          <span class="text-danger small">⚠️ Retards graves & plafonds proches</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm border-start border-4 border-warning">
+        <div class="card-body">
+          <span class="text-muted small text-uppercase fw-bold">Pénalités Estimées</span>
+          <h3 class="fw-bold text-dark my-1">{{ totalPenalitesEstimees | currency:'MAD':'symbol':'1.2-2' }}</h3>
+          <span class="text-warning small">💸 Impact financier potentiel</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card border-0 shadow-sm border-start border-4 border-success">
+        <div class="card-body">
+          <span class="text-muted small text-uppercase fw-bold">Marchés Actifs</span>
+          <h3 class="fw-bold text-success my-1">{{ alertesPenalites.length }}</h3>
+          <span class="text-muted small">📊 En cours de suivi</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: BLOC D'ALERTES PÉNALITÉS & RETARDS -->
   <div class="card border-0 shadow-sm mb-4">
     <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 px-4">
       <h5 class="m-0 text-danger font-weight-bold">
@@ -14,7 +62,6 @@
     </div>
 
     <div class="card-body px-4">
-
       <!-- Chargement -->
       <div *ngIf="chargementAlertes" class="text-center py-3">
         <div class="spinner-border spinner-border-sm text-danger" role="status"></div>
@@ -78,6 +125,42 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- SECTION 3: APERÇU RAPIDE DES MARCHÉS GREEN WOOD -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3 px-4">
+      <h5 class="m-0 font-weight-bold text-dark">📋 Vue Synthétique des Marchés</h5>
+      <a routerLink="/green-wood/marches" class="btn btn-sm btn-outline-primary">
+        Consulter tous les marchés
+      </a>
+    </div>
+    <div class="card-body px-4">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+          <tr>
+            <th>N° Marché</th>
+            <th>Objet</th>
+            <th>Montant HT</th>
+            <th>Statut</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let m of marchesGreenWood.slice(0, 5)">
+            <td class="fw-bold">{{ m.numMarche }}</td>
+            <td>{{ m.objetMarche }}</td>
+            <td>{{ m.budget | currency:'MAD':'symbol':'1.2-2' }}</td>
+            <td>
+                <span class="badge" [ngClass]="m.actif ? 'bg-success' : 'bg-secondary'">
+                  {{ m.actif ? 'Actif' : 'Inactif' }}
+                </span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 

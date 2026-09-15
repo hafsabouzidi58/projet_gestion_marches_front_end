@@ -6,7 +6,7 @@ import { MarcheService, Marche } from '../../../services/marche.service';
 import { DocumentService, DocumentModel } from '../../../services/document.service';
 import { DecompteService } from '../../../services/decompte.service';
 import { Decompte } from '../../../models/decompte.model';
-
+import { AvancementService, AvancementResponse, PenalitePrediction } from '../../../services/avancement.service';
 @Component({
   selector: 'app-marche-list',
   standalone: true,
@@ -25,6 +25,11 @@ export class MarcheListComponent implements OnInit {
   selectedMarcheForDecompte: Marche | null = null;
   selectedMarcheForDecompteList: Marche | null = null;
 
+  selectedMarcheForAvancement: Marche | null = null;
+
+  avancementsHistorique: AvancementResponse[] = [];
+
+  avancementPrediction?: PenalitePrediction
   documents: DocumentModel[] = [];
   decomptes: Decompte[] = [];
   soldeRestantMap: { [marcheId: number]: number } = {};
@@ -43,7 +48,8 @@ export class MarcheListComponent implements OnInit {
     private marcheService: MarcheService,
     private documentService: DocumentService,
     private decompteService: DecompteService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private avancementService: AvancementService
   ) {}
 
   ngOnInit(): void {
@@ -300,4 +306,57 @@ export class MarcheListComponent implements OnInit {
       error: (err) => console.error('Erreur lors du téléchargement du document', err)
     });
   }
+openAvancementModal(marche: Marche): void {
+    this.selectedMarcheForAvancement = marche;
+    if (marche.id) {
+      this.chargerHistoriqueAvancement(marche.id);
+      this.chargerPredictionAvancement(marche.id);
+    }
+  }
+
+  closeAvancementModal(): void {
+    this.selectedMarcheForAvancement = null;
+    this.avancementsHistorique = [];
+    this.avancementPrediction = undefined;
+  }
+
+  chargerHistoriqueAvancement(marcheId: number): void {
+    this.avancementService.getHistorique(marcheId).subscribe({
+      next: (data) => (this.avancementsHistorique = data),
+      error: (err) => console.error('Erreur chargement historique avancement', err)
+    });
+  }
+
+  chargerPredictionAvancement(marcheId: number): void {
+    this.avancementService.getPrediction(marcheId).subscribe({
+      next: (data) => (this.avancementPrediction = data),
+      error: (err) => console.error('Erreur chargement prédiction', err)
+    });
+  }
+
+
+telechargerFichier(nomFichier: string): void {
+    this.avancementService.telechargerFichier(nomFichier).subscribe({
+      next: (blob: Blob) => {
+        // Crée une URL temporaire pour le Blob reçu
+        const blobUrl = URL.createObjectURL(blob);
+
+        // Crée un lien <a> dynamique
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = nomFichier; // Forcer le téléchargement sous ce nom
+
+        // Ajoute au DOM, clique et supprime
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Libère la mémoire
+        URL.revokeObjectURL(blobUrl);
+      },
+      error: (err) => console.error('Erreur lors du téléchargement du fichier', err)
+    });
+  }
+
+
 }

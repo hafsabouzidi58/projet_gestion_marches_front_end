@@ -83,8 +83,8 @@
           <button class="btn btn-sm btn-outline-success me-1" (click)="openDecompteModal(m)" title="Saisir un décompte">
             💰 +Décompte
           </button>
-          <button class="btn btn-sm btn-outline-secondary me-1" (click)="openDocsModal(m)" title="Gérer les documents">
-            📂 Documents
+          <button class="btn btn-sm btn-outline-info me-1" (click)="openAvancementModal(m)" title="Suivi de l'avancement">
+            📊 Avancement
           </button>
           <button class="btn btn-sm btn-outline-primary me-1" (click)="onToggleStatus(m.id!)" title="Changer statut">
             🔄
@@ -324,6 +324,178 @@
           </div>
         </ng-template>
       </div>
+    </div>
+  </div>
+</div>
+<div class="custom-modal-overlay" *ngIf="selectedMarcheForDocs" (click)="closeDocsModal()">
+  <div class="custom-modal-dialog modal-lg" (click)="$event.stopPropagation()">
+    <div class="custom-modal-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="modal-icon">📂</span>
+        <h5 class="m-0 fw-bold">Documents du Marché N° {{ selectedMarcheForDocs.numMarche }}</h5>
+      </div>
+      <button type="button" class="btn-close-custom" (click)="closeDocsModal()">✕</button>
+    </div>
+
+    <div class="custom-modal-body">
+      <div class="card p-3 mb-3 bg-light">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-9">
+            <label class="form-label small fw-bold">Sélectionner un fichier</label>
+            <input
+              id="docFileInput"
+              type="file"
+              class="form-control form-control-sm"
+              (change)="onFileSelected($event)"
+            />
+          </div>
+          <div class="col-md-3 d-flex align-items-end">
+            <button
+              type="button"
+              class="btn btn-primary btn-sm w-100"
+              [disabled]="!selectedFile"
+              (click)="onUploadDoc()">
+              📤 Téléverser
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-striped align-middle" *ngIf="documents.length > 0; else noDocs">
+          <thead class="table-light">
+          <tr>
+            <th>Nom du fichier</th>
+            <th class="text-center" style="width: 200px;">Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let doc of documents">
+            <td class="text-break">📄 {{ doc.nomFichier }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-success me-1" (click)="onDownloadDoc(doc)" title="Télécharger">
+                📥 Télécharger
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="onDeleteDoc(doc.id)" title="Supprimer">
+                🗑️
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <ng-template #noDocs>
+          <div class="text-center py-4 text-muted">
+            <p class="mb-0">Aucun document associé à ce marché.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- MODAL DE CONSULTATION DE L'AVANCEMENT -->
+<div class="custom-modal-overlay" *ngIf="selectedMarcheForAvancement" (click)="closeAvancementModal()">
+  <div class="custom-modal-dialog modal-lg" (click)="$event.stopPropagation()">
+    <div class="custom-modal-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="modal-icon">📊</span>
+        <h5 class="m-0 fw-bold">Consultation d'Avancement - Marché N° {{ selectedMarcheForAvancement.numMarche }}</h5>
+      </div>
+      <button type="button" class="btn-close-custom" (click)="closeAvancementModal()">✕</button>
+    </div>
+
+    <div class="custom-modal-body">
+
+      <!-- Indicateurs & Prédictions -->
+      <div *ngIf="avancementPrediction" class="card mb-4" [ngClass]="{'border-danger': avancementPrediction.alertePrioritaire, 'border-success': !avancementPrediction.alertePrioritaire}">
+        <div class="card-header font-weight-bold" [ngClass]="{'bg-danger text-white': avancementPrediction.alertePrioritaire, 'bg-light': !avancementPrediction.alertePrioritaire}">
+          Indicateurs & Prédictions
+        </div>
+        <div class="card-body">
+          <div class="row text-center mb-3">
+            <div class="col-md-3">
+              <h6 class="text-muted">Prévu</h6>
+              <span class="badge bg-info text-white p-2" style="font-size: 1rem;">
+                {{ avancementPrediction.avancementPrevuPct }}%
+              </span>
+            </div>
+            <div class="col-md-3">
+              <h6 class="text-muted">Réel</h6>
+              <span class="badge bg-primary text-white p-2" style="font-size: 1rem;">
+                {{ avancementPrediction.avancementReelPct ?? 0 }}%
+              </span>
+            </div>
+            <div class="col-md-3">
+              <h6 class="text-muted">Écart</h6>
+              <span class="badge p-2 text-white" [ngClass]="avancementPrediction.ecartPct > 0 ? 'bg-danger' : 'bg-success'" style="font-size: 1rem;">
+                {{ avancementPrediction.ecartPct }}%
+              </span>
+            </div>
+            <div class="col-md-3">
+              <h6 class="text-muted">Pénalités Estimées</h6>
+              <span class="fw-bold text-danger d-block mt-1" style="font-size: 1rem;">
+                {{ avancementPrediction.montantPenaliteEstime | number:'1.2-2' }} DH
+              </span>
+            </div>
+          </div>
+
+          <!-- Barres de progression -->
+          <div class="row">
+            <div class="col-md-6 mb-2">
+              <small class="fw-bold text-muted d-block mb-1">Progression Prévue ({{ avancementPrediction.avancementPrevuPct }}%)</small>
+              <div class="progress" style="height: 12px;">
+                <div class="progress-bar bg-info" [style.width.%]="avancementPrediction.avancementPrevuPct"></div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-2">
+              <small class="fw-bold text-muted d-block mb-1">Progression Réelle ({{ avancementPrediction.avancementReelPct ?? 0 }}%)</small>
+              <div class="progress" style="height: 12px;">
+                <div class="progress-bar" [style.width.%]="avancementPrediction.avancementReelPct ?? 0" [ngClass]="avancementPrediction.ecartPct > 0 ? 'bg-danger' : 'bg-success'"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historique des Avancements (Lecture Seule) -->
+      <h6 class="fw-bold mb-2">Historique des Avancements</h6>
+      <div class="table-responsive">
+        <table class="table table-striped align-middle" *ngIf="avancementsHistorique.length > 0; else noAvancements">
+          <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Prévu (%)</th>
+            <th>Réel (%)</th>
+            <th>Description</th>
+            <th>Pièces Jointes</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let item of avancementsHistorique">
+            <td>{{ item.dateAvancement }}</td>
+            <td>{{ item.tauxPrevu }}%</td>
+            <td><strong>{{ item.tauxReel }}%</strong></td>
+            <td>{{ item.description }}</td>
+            <td>
+              <ul class="list-unstyled mb-0">
+                <li *ngFor="let file of item.piecesJointes">
+                  <a href="javascript:void(0)"
+                     (click)="telechargerFichier(file.nomFichier)"
+                     class="text-primary font-weight-bold cursor-pointer">
+                    📁 {{ file.nomFichier }}
+                  </a>
+                </li>
+              </ul>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <ng-template #noAvancements>
+          <div class="text-center py-3 text-muted">
+            <p class="mb-0">Aucun avancement enregistré pour ce marché.</p>
+          </div>
+        </ng-template>
+      </div>
+
     </div>
   </div>
 </div>
