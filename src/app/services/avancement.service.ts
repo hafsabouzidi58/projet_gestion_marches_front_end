@@ -83,13 +83,13 @@ export class AvancementService {
   }
 
   // Ajouter l'option responseType: 'blob'
-  telechargerFichier(nomFichier: string): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/fichiers/${nomFichier}`, {
-      responseType: 'blob'
-    });
-  }
-
-
+// Encodage du nom de fichier pour gérer les espaces et caractères spéciaux (&, ?, etc.)
+telechargerFichier(nomFichier: string): Observable<Blob> {
+  const nomFichierEncode = encodeURIComponent(nomFichier);
+  return this.http.get(`${this.apiUrl}/fichiers/${nomFichierEncode}`, {
+    responseType: 'blob'
+  });
+}
   // Récupérer la prédiction des pénalités d'un marché
   getPredictionPenalites(marcheId: number): Observable<PenalitePrediction> {
     return this.http.get<PenalitePrediction>(`${this.apiUrl}/prediction/marche/${marcheId}`);
